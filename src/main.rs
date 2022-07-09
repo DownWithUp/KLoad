@@ -10,7 +10,6 @@ use clap::Parser;
 use winapi::ctypes::*;
 use winapi::shared::minwindef::*;
 use winapi::shared::ntdef::{NTSTATUS, PUNICODE_STRING, UNICODE_STRING};
-use winapi::shared::winerror::S_OK;
 use winapi::um::errhandlingapi::GetLastError;
 use winapi::um::libloaderapi::GetModuleHandleA;
 use winapi::um::winnt::*;
@@ -108,14 +107,14 @@ fn create_keys(driver_name: &CStr, nt_driver_path: &[CHAR; MAX_PATH], path_lengt
 
         // Create a key in the under the current machine control set services
         if RegCreateKeyA(HKEY_LOCAL_MACHINE, subkey.as_str().as_ptr() as *const i8, 
-        &key_handle as *const HKEY as*mut HKEY) != S_OK {
+        &key_handle as *const HKEY as*mut HKEY) != 0 {
                 return Some(GetLastError());
         }
 
         // Create an image path string value 
         let image_path = CString::new("ImagePath");
         if RegSetValueExA(key_handle, image_path.unwrap().as_ptr(), 0, REG_SZ, 
-            nt_driver_path.as_ptr() as *const u8, path_length) != S_OK {
+            nt_driver_path.as_ptr() as *const u8, path_length) != 0 {
                 return Some(GetLastError());
         }
 
@@ -123,7 +122,7 @@ fn create_keys(driver_name: &CStr, nt_driver_path: &[CHAR; MAX_PATH], path_lengt
         let type_name = CString::new("Type");
         let type_data: DWORD = 1;
         if RegSetValueExA(key_handle, type_name.unwrap().as_ptr(), 0, REG_DWORD, 
-            &type_data as *const DWORD as *mut u8, std::mem::size_of_val(&type_data) as u32) != S_OK {
+            &type_data as *const DWORD as *mut u8, std::mem::size_of_val(&type_data) as u32) != 0 {
                 return Some(GetLastError());
         }
     }
