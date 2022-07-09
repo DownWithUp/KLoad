@@ -44,7 +44,7 @@ struct Args {
 }
 
 
-// Convers the input driver path to an VOLUME_NAME_NT file path. This is done by temporarily opening the file.
+// Converts the input driver path to an VOLUME_NAME_NT file path. This is done by temporarily opening the file.
 fn get_nt_path(driver_path: &CStr, nt_file_path: &mut [CHAR; MAX_PATH]) -> Result<DWORD, DWORD> {
     unsafe {
         let file_handle  = CreateFileA(driver_path.as_ptr() as *const i8, GENERIC_READ, FILE_SHARE_READ, 
@@ -55,7 +55,6 @@ fn get_nt_path(driver_path: &CStr, nt_file_path: &mut [CHAR; MAX_PATH]) -> Resul
             return Err(GetLastError());
         }
 
-        println!("file_handle: {}", file_handle as u64);
         let return_size = GetFinalPathNameByHandleA(file_handle, nt_file_path.as_ptr() as *mut i8, MAX_PATH as u32, 
         FILE_NAME_NORMALIZED | VOLUME_NAME_NT);
         if return_size == 0 {
